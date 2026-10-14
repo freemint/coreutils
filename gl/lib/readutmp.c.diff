@@ -1,0 +1,36 @@
+--- a/lib/readutmp.c
++++ b/lib/readutmp.c
+@@ -56,6 +56,9 @@
+ # endif
+ # include <sys/sysctl.h>
+ #endif
++#ifdef __MINT__
++#include <mint/sysctl.h>
++#endif
+ 
+ #if HAVE_OS_H
+ # include <OS.h>
+@@ -454,6 +457,23 @@
+             a = add_utmp (a, options,
+                           "reboot", strlen ("reboot"),
+                           "", 0,
++                          "~", strlen ("~"),
++                          "", 0,
++                          0, BOOT_TIME, boot_time, 0, 0, 0);
++        }
++    }
++#   endif
++
++#   if defined __MINT__
++  if ((options & (READ_UTMP_USER_PROCESS | READ_UTMP_NO_BOOT_TIME)) == 0)
++    {
++      if (!have_boot_time (a))
++        {
++          struct timespec boot_time;
++          if (get_mint_boot_time (&boot_time) >= 0)
++            a = add_utmp (a, options,
++                          "reboot", strlen ("reboot"),
++                          "", 0,
+                           "~", strlen ("~"),
+                           "", 0,
+                           0, BOOT_TIME, boot_time, 0, 0, 0);

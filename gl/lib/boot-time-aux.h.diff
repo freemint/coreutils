@@ -1,0 +1,34 @@
+--- a/lib/boot-time-aux.h
++++ b/lib/boot-time-aux.h
+@@ -255,6 +255,31 @@
+ 
+ #endif
+ 
++#ifdef __MINT__
++/* FreeMiNT */
++static int
++get_mint_boot_time(struct timespec *p_boot_time)
++{
++  static int request[2] = { CTL_KERN, KERN_BOOTTIME };
++  struct timeval result;
++  size_t result_len = sizeof result;
++
++# if defined(CLOCK_BOOTTIME)
++  if (clock_gettime (CLOCK_BOOTTIME, p_boot_time) >= 0)
++    return 0;
++# endif
++
++  if (sysctl (request, 2, &result, &result_len, NULL, 0) >= 0)
++    {
++      p_boot_time->tv_sec = result.tv_sec;
++      p_boot_time->tv_nsec = result.tv_usec * 1000;
++      return 0;
++    }
++  return -1;
++}
++
++#endif
++
+ #if defined __HAIKU__
+ 
+ static int
