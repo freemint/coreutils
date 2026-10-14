@@ -57,17 +57,15 @@ baud_to_value (speed_t speed)
 # ifdef TERMIOS_SPEED_T_SANE
   return speed;
 # else
-  switch (speed)
-    {
 EOF
 
+# Not a switch: two speeds may share a value, like B134 and B135 on MiNT.
 while read n; do
-  printf '#  ifdef B%s\n      case B%s: return %s;\n#  endif\n' "$n" "$n" "$n"
+  printf '#  ifdef B%s\n  if (speed == B%s)\n    return %s;\n#  endif\n' "$n" "$n" "$n"
 done < "$tmp" >> "$out"
 
 cat >> "$out" <<'EOF'
-      default: return -1;
-    }
+  return -1;
 # endif
 }
 
