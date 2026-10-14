@@ -298,6 +298,25 @@ src_dd_LDADD += $(FDATASYNC_LIB)
 src_shred_LDADD += $(FDATASYNC_LIB)
 src_sync_LDADD += $(FDATASYNC_LIB)
 
+# partition access on MiNT, built without gnulib's headers, which rename
+# open() and other calls that libIO overrides
+EXTRA_DIST += src/libIO/README.md src/libIO/mint_io.c src/libIO/mint_io.h \
+	      src/libIO/xhdi.c src/libIO/xhdi.h
+if MINT
+noinst_LIBRARIES += src/libmintio.a
+src_libmintio_a_SOURCES =
+src_libmintio_a_LIBADD = src/libIO/mint_io.$(OBJEXT) src/libIO/xhdi.$(OBJEXT)
+MOSTLYCLEANFILES += $(src_libmintio_a_LIBADD)
+src/libIO/mint_io.$(OBJEXT): $(srcdir)/src/libIO/mint_io.c \
+			     $(srcdir)/src/libIO/mint_io.h $(srcdir)/src/libIO/xhdi.h
+	$(AM_V_CC)$(MKDIR_P) src/libIO && \
+	  $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $(srcdir)/src/libIO/mint_io.c
+src/libIO/xhdi.$(OBJEXT): $(srcdir)/src/libIO/xhdi.c $(srcdir)/src/libIO/xhdi.h
+	$(AM_V_CC)$(MKDIR_P) src/libIO && \
+	  $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $(srcdir)/src/libIO/xhdi.c
+src_dd_LDADD += src/libmintio.a
+endif
+
 # for xnanosleep
 src_sleep_LDADD += $(NANOSLEEP_LIB)
 src_sort_LDADD += $(NANOSLEEP_LIB)

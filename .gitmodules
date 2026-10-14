@@ -1,3 +1,6 @@
 [submodule "gnulib"]
         path = gnulib
         url = https://git.savannah.gnu.org/git/gnulib.git
+[submodule "src/libIO"]
+        path = src/libIO
+        url = https://github.com/freemint/libIO.git

@@ -157,6 +157,15 @@ if test "$gl_bold_manpages" != no; then
 fi
 AM_CONDITIONAL([BOLD_MAN_REFS], [test "$gl_bold_manpages" != no])
 
+# dd reaches partitions on MiNT through the libIO submodule
+AM_CONDITIONAL([MINT], [case $host in *-mint*) true ;; *) false ;; esac])
+case $host in
+  *-mint*)
+    AS_IF([test ! -f "$srcdir/src/libIO/mint_io.c"],
+          [AC_MSG_ERROR([src/libIO is empty; run git submodule update --init])])
+    ;;
+esac
+
 # When generating manual pages, include a "Report any translation bugs" line.
 AC_DEFINE([PACKAGE_L10N_BUGREPORT], ["https://translationproject.org/team/"],
   [Define to the URL of your translation project.])
