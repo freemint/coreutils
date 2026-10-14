@@ -406,6 +406,14 @@ enum
     break;
 
 #include "minmax.h"
+#ifdef __MINT__
+/* MiNT's <sys/param.h> defines MIN and MAX as statement expressions, which
+   can't be used in constant expressions.  */
+# undef MIN
+# undef MAX
+# define MIN(a, b) ((a) < (b) ? (a) : (b))
+# define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
 #include "intprops.h"
 
 #ifndef SSIZE_MAX
