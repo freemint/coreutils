@@ -1,0 +1,11 @@
+--- a/lib/filename.h
++++ b/lib/filename.h
+@@ -59,7 +59,7 @@
+                                     or directory specification.
+  */
+ #if defined _WIN32 || defined __CYGWIN__ \
+-    || defined __EMX__ || defined __MSDOS__ || defined __DJGPP__
++    || defined __EMX__ || defined __MSDOS__ || defined __DJGPP__ || defined __MINT__
+   /* Native Windows, Cygwin, OS/2, DOS */
+ # define ISSLASH(C) ((C) == '/' || (C) == '\\')
+   /* Internal macro: Tests whether a character is a drive letter.  */
