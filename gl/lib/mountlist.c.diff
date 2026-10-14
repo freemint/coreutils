@@ -1,0 +1,100 @@
+--- a/lib/mountlist.c
++++ b/lib/mountlist.c
+@@ -117,6 +117,30 @@
+ # include <dirent.h>
+ #endif
+ 
++#ifdef __MINT__
++#include <mintbind.h>
++#include <osbind.h>
++#include <sys/statfs.h>
++#include <mint/dcntl.h>
++
++int get_fsname (const char *path, char *xfs_name, char *type_name);
++
++/* get the list of available drives */
++static long
++get_drives(void)
++{
++	long drive_bits;
++	int drv;
++	
++	drv = Dgetdrv();
++	drive_bits = Dsetdrv(drv);
++	drive_bits &= ~(1|2); /* exclude all floppies */
++		
++	return drive_bits;
++}
++
++#endif
++
+ #if HAVE_SYS_MNTENT_H
+ /* This is to get MNTOPT_IGNORE on e.g. SVR4.  */
+ # include <sys/mntent.h>
+@@ -450,6 +474,66 @@
+   struct mount_entry **mtail = &mount_list;
+   (void) need_fs_type;
+ 
++#ifdef __MINT__
++  {
++	struct statfs fsp;
++	long drive_bits;
++	int i, j;
++	char lw[] = "a:/";
++	char mountdir[] = "u:/x";
++	char dev[] = "/dev/x";
++	
++	drive_bits = get_drives();
++	for (i = 0; i < 32; i++)
++	{
++		if (drive_bits & (1L << i))
++		{
++			if (i < 26)
++				lw[0] = 'a' + i;
++			else
++				lw[0] = '1' + i - 26;
++			
++			if(statfs(lw, &fsp) == 0)
++			{
++				char name[32];
++
++				me = xmalloc (sizeof (*me));
++				
++				dev[5] = lw[0];
++				mountdir[3] = lw[0];
++				me->me_dev = i;
++				me->me_mntroot = NULL;
++				me->me_dummy = false;
++				me->me_remote = false;
++				if (i == ('U' - 'A'))
++				{
++					me->me_devname  = xstrdup("rootfs");
++					me->me_mountdir = xstrdup("/");
++				} else
++				{
++					me->me_devname  = xstrdup(dev);
++					me->me_mountdir = xstrdup(mountdir);
++				}		
++				me->me_type = NULL;
++				
++				if (need_fs_type)
++				{
++					get_fsname(lw, NULL, name);
++					me->me_type = xstrdup(name);
++					me->me_type_malloced = 1;
++					me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
++				}
++				/* Add to the linked list. */
++				*mtail = me;
++				mtail = &me->me_next;
++			}
++		}
++	}
++	*mtail = NULL;
++	return mount_list;
++  }
++#endif
++
+ #ifdef MOUNTED_GETMNTENT1       /* glibc, HP-UX, Cygwin, Android,
+                                    also (obsolete) 4.3BSD, SunOS */
+   {
