@@ -1,0 +1,56 @@
+--- a/lib/physmem.c
++++ b/lib/physmem.c
+@@ -89,6 +89,31 @@
+ 
+ #endif
+ 
++#ifdef __MINT__
++#include <mint/osbind.h>
++#include <mint/sysctl.h>
++
++static double
++freemem(void)
++{
++  int call[2] = { CTL_HW, HW_FREEPHYSMEM };
++  unsigned long free;
++  unsigned long freesize = sizeof (free);
++  long ret;
++
++  ret = sysctl (call, 2, &free, &freesize, NULL, 0);
++  if (ret == 0)
++    return free / 2;
++  
++  ret = Malloc(-1);
++  if (ret > 0)
++    return ret / 2;
++  
++  /* Guess 1 MB.  */
++  return 1024 * 1024;
++}
++#endif
++
+ /* Return the total amount of physical memory.  */
+ double
+ physmem_total (void)
+@@ -168,6 +193,10 @@
+   }
+ #endif
+ 
++#ifdef __MINT__
++  return freemem();
++#endif
++
+   /* Guess 64 MB.  It's probably an older host, so guess small.  */
+   return 64 * 1024 * 1024;
+ }
+@@ -369,6 +398,10 @@
+   }
+ #endif
+ 
++#ifdef __MINT__
++  return freemem();
++#endif
++
+   /* Guess 25% of physical memory.  */
+   return physmem_total () / 4;
+ }
