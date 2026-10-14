@@ -1,0 +1,11 @@
+--- a/lib/filemode.c
++++ b/lib/filemode.c
+@@ -67,7 +67,7 @@
+     return 'C';
+   if (S_ISDOOR (bits))
+     return 'D';
+-  if (S_ISMPB (bits) || S_ISMPC (bits) || S_ISMPX (bits))
++  if (S_ISMPB (bits) || S_ISMPC (bits) || S_ISMPX (bits) || S_ISMEM (bits))
+     return 'm';
+   if (S_ISNWK (bits))
+     return 'n';

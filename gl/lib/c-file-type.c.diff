@@ -1,0 +1,11 @@
+--- a/lib/c-file-type.c
++++ b/lib/c-file-type.c
+@@ -107,5 +107,8 @@
+   if (S_ISWHT (st->st_mode))
+     return N_("whiteout");
+ 
++  if (S_ISMEM (st->st_mode))
++    return N_("memory");
++
+   return N_("weird file");
+ }

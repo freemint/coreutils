@@ -4914,6 +4914,8 @@ get_type_indicator (bool stat_ok, mode_t mode, enum filetype type)
         c = '=';
       else if (stat_ok && S_ISDOOR (mode))
         c = '>';
+      else if (stat_ok && S_ISMEM (mode))
+        c = '>';
       else
         c = 0;
     }

@@ -1,0 +1,25 @@
+--- a/lib/sys_stat.in.h
++++ b/lib/sys_stat.in.h
+@@ -209,6 +209,7 @@
+ # undef S_ISNWK
+ # undef S_ISREG
+ # undef S_ISSOCK
++# undef S_ISMEM
+ #endif
+ 
+ #ifndef S_ISBLK
+@@ -305,6 +306,14 @@
+ # endif
+ #endif
+ 
++#ifndef S_ISMEM
++# ifdef __S_IFMEM
++#  define S_ISMEM(m) (((m) & S_IFMT) == __S_IFMEM)
++# else
++#  define S_ISMEM(m) 0
++# endif
++#endif
++
+ 
+ #ifndef S_TYPEISMQ
+ # define S_TYPEISMQ(p) 0
