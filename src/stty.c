@@ -2102,7 +2102,7 @@ display_all (struct termios *mode, char const *device_name)
 static void
 check_speed (struct termios *mode)
 {
-  if (last_ibaud != -1 && last_obaud != -1)
+  if (last_ibaud != (speed_t) -1 && last_obaud != (speed_t) -1)
     {
       if (cfgetispeed (mode) != last_ibaud
           || cfgetospeed (mode) != last_obaud)
